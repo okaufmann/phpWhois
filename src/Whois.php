@@ -68,7 +68,7 @@ class Whois extends WhoisClient
      * @param boolean $is_utf True if domain name encoding is utf-8 already, otherwise convert it with utf8_encode() first
      *
      */
-    public function lookup($query = '', $is_utf = true)
+    public function lookup($query = '', $folder=false,  $is_utf = true)
     {
         // start clean
         $this->query = array('status' => '');
@@ -214,15 +214,27 @@ class Whois extends WhoisClient
                 }
 
                 // Regular handler exists for the tld ?
-                if (file_exists('whois.' . $htld . '.php')) {
+                 
+                 
+                if (file_exists( $folder . '/whois.' . $htld . '.php')) {
+                    $handler = $htld;
+                    break;
+                } elseif (file_exists( __DIR__ .'/whois.' . $htld . '.php')) {
                     $handler = $htld;
                     break;
                 }
+
+
             }
 
             // If there is a handler set it
             if ($handler != '') {
-                $this->query['file'] = "whois.$handler.php";
+
+                if (file_exists( $folder . '/whois.' . $htld . '.php')) {
+                    $this->query['file'] = $folder . "/whois.$handler.php";
+                } else {
+                    $this->query['file'] = __DIR__ . "/whois.$handler.php";
+                }
                 $this->query['handler'] = $handler;
             }
 
